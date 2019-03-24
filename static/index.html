@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 
-<html lang="en" ng-app="SocketIoApp">
+<html lang="en" ng-app="PhaserIoPlayground">
   <head>
     <meta charset="utf-8" />
 
-    <title>Phaser.io - Playground</title>
+    <title ng-bind-template="{{ title && title.length ? title + ' - ' : '' }}Phaser.io Playgound">Phaser.io Playgound</title>
     <meta name="description" content="Playing around with Phaser.io" />
     <meta name="author" content="ScottChak" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
+    <!-- Bootstrap -->
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -23,18 +24,21 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
-          <h1>Phaser.io - Playground</h1>
+          <h1 ng-bind-template="{{ title && title.length ? title + ' - ' : '' }}Phaser.io Playgound">Phaser.io Playgound</h1>
         </div>
       </div>
 
       <ui-view></ui-view>
     </div>
 
+    <!-- JQuery -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Bootstrap -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
       integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
@@ -45,13 +49,25 @@
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Angular -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js" crossorigin="anonymous"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.22/angular-ui-router.min.js"
       crossorigin="anonymous"
     ></script>
 
+    <!-- Phaser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.16.2/phaser.min.js" crossorigin="anonymous"></script>
+
+    <!-- App Setup -->
     <script src="./scripts/app.js"></script>
+
+    <!-- Services -->
+    <script src="./scripts/services/pageservice.js"></script>
+    <script src="./scripts/services/pong/v1/service.js"></script>
+
+    <!-- Controllers -->
     <script src="./scripts/controllers/homecontroller.js"></script>
     <script src="./scripts/controllers/pong/v1/controller.js"></script>
   </body>

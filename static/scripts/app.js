@@ -1,4 +1,4 @@
-let app = angular.module("SocketIoApp", ["ui.router"]);
+let app = angular.module("PhaserIoPlayground", ["ui.router"]);
 
 app.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider.state("home", {

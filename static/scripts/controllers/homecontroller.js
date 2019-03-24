@@ -1,6 +1,9 @@
 app.controller("HomeController", [
   "$scope",
-  function($scope) {
+  "PageService",
+  function($scope, pageService) {
     let ctrl = this;
+
+    pageService.setTitle("Home");
   }
 ]);
