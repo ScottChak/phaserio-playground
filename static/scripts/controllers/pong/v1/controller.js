@@ -5,7 +5,7 @@ app.controller("PongV1Controller", [
   function($scope, pageService, pongV1Service) {
     let ctrl = this;
 
-    pageService.setTitle("Pong V1");
+    pageService.setTitle("Pong - Version 1");
 
     pongV1Service.start("PhaserContainer");
     angular.element(".phaserWrapper").width(pongV1Service.config.width);

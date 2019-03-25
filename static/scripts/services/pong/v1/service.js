@@ -2,13 +2,10 @@ app.factory("PongV1Service", [
   function() {
     let svc = {};
 
-    svc.width = 768;
-    svc.height = 512;
-
     svc.config = {
       type: Phaser.AUTO,
-      width: svc.width,
-      height: svc.height,
+      width: 768,
+      height: 512,
       scene: {
         preload: preload,
         create: create,

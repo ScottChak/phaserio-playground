@@ -7,6 +7,25 @@ app.config(function($stateProvider, $urlRouterProvider) {
     controller: "HomeController as ctrl"
   });
 
+  //  Official Phaser 3
+  $stateProvider.state("official", {
+    url: "/official",
+    abstract: true
+  });
+
+  $stateProvider.state("official.gettingstarted", {
+    url: "/gettingstarted",
+    templateUrl: "../templates/official/gettingstarted.html",
+    controller: "OfficialGettingStartedController as ctrl"
+  });
+
+  $stateProvider.state("official.firstgame", {
+    url: "/firstgame",
+    templateUrl: "../templates/official/firstgame.html",
+    controller: "OfficialFirstGameController as ctrl"
+  });
+
+  //  Pong
   $stateProvider.state("pong", {
     url: "/pong",
     abstract: true

@@ -28,7 +28,40 @@
         </div>
       </div>
 
-      <ui-view></ui-view>
+      <div class="row">
+        <div class="col-3">
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Official Phaser 3</h5>
+                </div>
+
+                <div class="list-group list-group-flush">
+                  <a ui-sref="official.gettingstarted" class="list-group-item list-group-item-action">Getting started</a>
+                  <a ui-sref="official.firstgame" class="list-group-item list-group-item-action">First game</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Pong</h5>
+                </div>
+
+                <div class="list-group-flush">
+                  <a ui-sref="pong.v1" class="list-group-item list-group-item-action">Version 1</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-9">
+          <ui-view></ui-view>
+        </div>
+      </div>
     </div>
 
     <!-- JQuery -->
@@ -65,10 +98,22 @@
 
     <!-- Services -->
     <script src="./scripts/services/pageservice.js"></script>
+
+    <!-- Official -->
+    <script src="./scripts/services/official/gettingstarted/service.js"></script>
+    <script src="./scripts/services/official/firstgame/service.js"></script>
+
+    <!-- Pong -->
     <script src="./scripts/services/pong/v1/service.js"></script>
 
     <!-- Controllers -->
     <script src="./scripts/controllers/homecontroller.js"></script>
+
+    <!-- Official -->
+    <script src="./scripts/controllers/official/gettingstarted/controller.js"></script>
+    <script src="./scripts/controllers/official/firstgame/controller.js"></script>
+
+    <!-- Pong -->
     <script src="./scripts/controllers/pong/v1/controller.js"></script>
   </body>
 </html>

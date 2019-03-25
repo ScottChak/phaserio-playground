@@ -1,3 +1,11 @@
 .phaserWrapper {
   margin: auto;
 }
+
+.card {
+  margin-bottom: 20px;
+}
+
+.card-body {
+  padding-bottom: 8px;
+}
