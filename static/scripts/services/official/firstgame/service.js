@@ -63,7 +63,7 @@ app.factory("OfficialFirstGameService", [
       //  SCK: Create the bombs
       createBombs(this);
 
-      scoreText = this.add.text(16, 16, "Score: " + score, { fontSize: "32px", fill: "#000" });
+      scoreText = this.add.text(16, 16, "Score: " + score, { fontSize: "32px" });
     }
 
     function update() {
