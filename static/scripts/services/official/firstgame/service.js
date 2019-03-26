@@ -2,14 +2,22 @@ app.factory("OfficialFirstGameService", [
   function() {
     let svc = {};
 
+    let initialWidth = 800;
+    let initialHeight = 600;
+
+    let playerVelocityXFactor = 0.2;
+    let playerVelocityYFactor = 1.6;
+    let gravityYFactor = 0.5;
+
     svc.config = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 600,
+      width: initialWidth,
+      height: initialHeight,
       physics: {
         default: "arcade",
         arcade: {
-          gravity: { y: 300 },
+          //  SCK: Base gravity for everything in the world
+          gravity: { y: initialHeight * gravityYFactor },
           debug: false
         }
       },
@@ -20,14 +28,15 @@ app.factory("OfficialFirstGameService", [
       }
     };
 
+    let cursors;
+
+    let platforms;
     let player;
     let stars;
     let bombs;
 
     let score = 0;
     let scoreText;
-
-    let cursors;
 
     function preload() {
       this.load.image("sky", "assets/official/firstgame/sky.png");
@@ -39,9 +48,32 @@ app.factory("OfficialFirstGameService", [
     }
 
     function create() {
-      this.add.image(400, 300, "sky");
+      //  SCK: Get input
+      cursors = this.input.keyboard.createCursorKeys();
 
-      let platforms = this.physics.add.staticGroup();
+      //  SCK: Create the world
+      createWorld(this);
+
+      //  SCK: Create the player
+      createPlayer(this);
+
+      //  SCK: Create the stars
+      createStars(this);
+
+      //  SCK: Create the bombs
+      createBombs(this);
+
+      scoreText = this.add.text(16, 16, "Score: " + score, { fontSize: "32px", fill: "#000" });
+    }
+
+    function update() {
+      updatePlayerVelocity();
+    }
+
+    function createWorld(gameCtx) {
+      gameCtx.add.image(400, 300, "sky");
+
+      platforms = gameCtx.physics.add.staticGroup();
       platforms.create(600, 400, "ground");
       platforms.create(50, 250, "ground");
       platforms.create(750, 220, "ground");
@@ -49,35 +81,44 @@ app.factory("OfficialFirstGameService", [
         .create(400, 568, "ground")
         .setScale(2)
         .refreshBody();
+    }
 
-      player = this.physics.add.sprite(100, 450, "dude");
-      player.body.setGravityY(300);
-      player.setBounce(0.2);
-      player.setCollideWorldBounds(true);
+    function createPlayer(gameCtx) {
+      //  SCK: Create the player
+      player = gameCtx.physics.add.sprite(100, 450, "dude");
 
-      this.anims.create({
+      //  SCK: Player is heavier than bombs and stars
+      player.body.setGravityY(svc.config.height * gravityYFactor);
+
+      //  SCK: Player is animated
+      gameCtx.anims.create({
         key: "left",
-        frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+        frames: gameCtx.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
         frameRate: 10,
         repeat: -1
       });
 
-      this.anims.create({
+      gameCtx.anims.create({
         key: "turn",
         frames: [{ key: "dude", frame: 4 }],
         frameRate: 20
       });
 
-      this.anims.create({
+      gameCtx.anims.create({
         key: "right",
-        frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
+        frames: gameCtx.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
         frameRate: 10,
         repeat: -1
       });
 
-      this.physics.add.collider(player, platforms);
+      //  Player physics with the world
+      player.setBounce(0.2);
+      player.setCollideWorldBounds(true);
+      gameCtx.physics.add.collider(player, platforms);
+    }
 
-      stars = this.physics.add.group({
+    function createStars(gameCtx) {
+      stars = gameCtx.physics.add.group({
         key: "star",
         repeat: 11,
         setXY: { x: 12, y: 0, stepX: 70 }
@@ -87,54 +128,41 @@ app.factory("OfficialFirstGameService", [
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
       });
 
-      this.physics.add.collider(stars, platforms);
-      this.physics.add.overlap(player, stars, collectStar, null, this);
-
-      bombs = this.physics.add.group();
-      this.physics.add.collider(bombs, platforms);
-      this.physics.add.collider(player, bombs, hitBomb, null, this);
-
-      scoreText = this.add.text(16, 16, "Score: " + score, { fontSize: "32px", fill: "#000" });
-      cursors = this.input.keyboard.createCursorKeys();
+      gameCtx.physics.add.collider(stars, platforms);
+      gameCtx.physics.add.overlap(player, stars, collectStar, null, gameCtx);
     }
 
-    function update() {
-      let playerVelocity = 160;
-
-      if (cursors.left.isDown) {
-        player.setVelocityX(-playerVelocity);
-        player.anims.play("left", true);
-      } else if (cursors.right.isDown) {
-        player.setVelocityX(playerVelocity);
-        player.anims.play("right", true);
-      } else {
-        player.setVelocityX(0);
-        player.anims.play("turn");
-      }
-
-      if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-480);
-      }
+    function createBombs(gameCtx) {
+      bombs = gameCtx.physics.add.group();
+      gameCtx.physics.add.collider(bombs, platforms);
+      gameCtx.physics.add.collider(player, bombs, hitBomb, null, gameCtx);
     }
 
     function collectStar(player, star) {
+      //  SCK: Remove star
       star.disableBody(true, true);
 
       score += 10;
       scoreText.setText("Score: " + score);
 
+      //  SCK: Reset stars if all collected
       if (stars.countActive(true) === 0) {
         stars.children.iterate(function(child) {
           child.enableBody(true, child.x, 0, true, true);
         });
 
-        var x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, "bomb");
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        //  SCK: Spawn bomb
+        spawnBomb();
       }
+    }
+
+    function spawnBomb() {
+      var bombX = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+      var bomb = bombs.create(bombX, 16, "bomb");
+      bomb.setCollideWorldBounds(true);
+      bomb.setBounce(1);
+      bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
     }
 
     function hitBomb(player, bomb) {
@@ -144,6 +172,25 @@ app.factory("OfficialFirstGameService", [
       player.anims.play("turn");
 
       gameOver = true;
+    }
+
+    function updatePlayerVelocity() {
+      //  SCK: Velocity X (Move left and right)
+      if (cursors.left.isDown) {
+        player.setVelocityX(-1 * svc.config.width * playerVelocityXFactor);
+        player.anims.play("left", true);
+      } else if (cursors.right.isDown) {
+        player.setVelocityX(svc.config.width * playerVelocityXFactor);
+        player.anims.play("right", true);
+      } else {
+        player.setVelocityX(0);
+        player.anims.play("turn");
+      }
+
+      //  SCK: Velocity Y (Jump)
+      if (cursors.up.isDown && player.body.touching.down) {
+        player.setVelocityY(-1 * playerVelocityYFactor * svc.config.height * gravityYFactor);
+      }
     }
 
     svc.start = function(parent) {
