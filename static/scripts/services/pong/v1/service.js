@@ -13,8 +13,8 @@ app.factory("PongV1Service", [
     let paddleWidth = 8;
     let paddleHeight = 64;
 
-    let maxPaddleVelocity = 600;
-    let minPaddleVelocity = 600;
+    let maxPaddleVelocityY = 600;
+    let minPaddleVelocityY = 600;
 
     let ball;
     let paddles;
@@ -79,7 +79,7 @@ app.factory("PongV1Service", [
     }
 
     function createPaddles(gameCtx) {
-      let response = gameCtx.physics.add.staticGroup();
+      let response = gameCtx.physics.add.group();
       gameCtx.physics.add.collider(response, ball);
       return response;
     }
@@ -119,8 +119,8 @@ app.factory("PongV1Service", [
         "tile-white"
       );
 
-      gameCtx.physics.add.existing(response, true);
-      // response.body.setCollideWorldBounds(true);
+      gameCtx.physics.add.existing(response, false);
+      response.body.setCollideWorldBounds(true);
 
       paddles.add(response);
 
@@ -153,17 +153,20 @@ app.factory("PongV1Service", [
     }
 
     function movePaddleTowardsPointer(gameCtx, pointer, player) {
-      // let paddleVelocityDirection = pointer.y > player.paddle.y ? 1 : -1;
-      // let paddleVelocity = 0;
-      // let difference = Phaser.Math.Difference(pointer.y, player.paddle.y);
-      // if (difference > 16) {
-      //   let paddleVelocityFactor = Phaser.Math.SmoothStep(difference, 0, maxPaddleVelocity);
-      //   paddleVelocity = paddleVelocityFactor * maxPaddleVelocity;
-      //   if (paddleVelocity < minPaddleVelocity && paddleVelocity < Phaser.Math.Difference(0, player.paddle.body.velocity.y)) {
-      //     paddleVelocity = minPaddleVelocity;
-      //   }
-      // }
-      // player.paddle.body.setVelocity(0, paddleVelocityDirection * paddleVelocity);
+      let paddleVelocityYDirection = pointer.y > player.paddle.y ? 1 : -1;
+      let paddleVelocityY = 0;
+      let difference = Phaser.Math.Difference(pointer.y, player.paddle.y);
+      if (difference > 16) {
+        let paddleVelocityYFactor = Phaser.Math.SmoothStep(difference, 0, maxPaddleVelocityY);
+        paddleVelocityY = paddleVelocityYFactor * maxPaddleVelocityY;
+        if (
+          paddleVelocityY < minPaddleVelocityY &&
+          paddleVelocityY < Phaser.Math.Difference(0, player.paddle.body.velocity.y)
+        ) {
+          paddleVelocityY = minPaddleVelocityY;
+        }
+      }
+      player.paddle.body.setVelocityY(paddleVelocityYDirection * paddleVelocityY);
     }
 
     svc.start = function(parent) {
