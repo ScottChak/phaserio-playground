@@ -7,7 +7,8 @@ app.factory("PongV1Service", [
 
     let ballSize = 8;
 
-    let initialBallVelocity = 100;
+    let initialBallVelocityX = 200;
+    let initialBallVelocityY = 0;
 
     let paddleWidth = 8;
     let paddleHeight = 64;
@@ -51,8 +52,7 @@ app.factory("PongV1Service", [
       let paddleOffset = 16 + paddleWidth * 0.5;
       let scoreOffset = this.physics.world.bounds.width * 0.25;
 
-      paddles = this.physics.add.group();
-      this.physics.add.collider(paddles, ball);
+      paddles = createPaddles(this);
 
       player1 = createPlayer(this, paddleOffset, scoreOffset);
       player2 = createPlayer(
@@ -78,6 +78,12 @@ app.factory("PongV1Service", [
       movePaddleTowardsPointer(this, this.input.mousePointer, player2);
     }
 
+    function createPaddles(gameCtx) {
+      let response = gameCtx.physics.add.staticGroup();
+      gameCtx.physics.add.collider(response, ball);
+      return response;
+    }
+
     function createBall(gameCtx) {
       let response = gameCtx.add.tileSprite(
         gameCtx.physics.world.bounds.centerX,
@@ -87,7 +93,7 @@ app.factory("PongV1Service", [
         "tile-white"
       );
 
-      gameCtx.physics.add.existing(response);
+      gameCtx.physics.add.existing(response, false);
       response.body.setCollideWorldBounds(true);
       response.body.setBounce(1.0, 1.0);
 
@@ -113,8 +119,8 @@ app.factory("PongV1Service", [
         "tile-white"
       );
 
-      gameCtx.physics.add.existing(response);
-      response.body.setCollideWorldBounds(true);
+      gameCtx.physics.add.existing(response, true);
+      // response.body.setCollideWorldBounds(true);
 
       paddles.add(response);
 
@@ -129,7 +135,7 @@ app.factory("PongV1Service", [
 
     function startMatch(gameCtx) {
       if (!matchInProgress) {
-        ball.body.setVelocity(initialBallVelocity, initialBallVelocity);
+        ball.body.setVelocity(initialBallVelocityX, initialBallVelocityY);
         matchInProgress = true;
       }
     }
@@ -147,21 +153,17 @@ app.factory("PongV1Service", [
     }
 
     function movePaddleTowardsPointer(gameCtx, pointer, player) {
-      let paddleVelocityDirection = pointer.y > player.paddle.y ? 1 : -1;
-
-      let paddleVelocity = 0;
-
-      let difference = Phaser.Math.Difference(pointer.y, player.paddle.y);
-      if (difference > 16) {
-        let paddleVelocityFactor = Phaser.Math.SmoothStep(difference, 0, maxPaddleVelocity);
-
-        paddleVelocity = paddleVelocityFactor * maxPaddleVelocity;
-        if (paddleVelocity < minPaddleVelocity && paddleVelocity < Phaser.Math.Difference(0, player.paddle.body.velocity.y)) {
-          paddleVelocity = minPaddleVelocity;
-        }
-      }
-
-      player.paddle.body.setVelocity(0, paddleVelocityDirection * paddleVelocity);
+      // let paddleVelocityDirection = pointer.y > player.paddle.y ? 1 : -1;
+      // let paddleVelocity = 0;
+      // let difference = Phaser.Math.Difference(pointer.y, player.paddle.y);
+      // if (difference > 16) {
+      //   let paddleVelocityFactor = Phaser.Math.SmoothStep(difference, 0, maxPaddleVelocity);
+      //   paddleVelocity = paddleVelocityFactor * maxPaddleVelocity;
+      //   if (paddleVelocity < minPaddleVelocity && paddleVelocity < Phaser.Math.Difference(0, player.paddle.body.velocity.y)) {
+      //     paddleVelocity = minPaddleVelocity;
+      //   }
+      // }
+      // player.paddle.body.setVelocity(0, paddleVelocityDirection * paddleVelocity);
     }
 
     svc.start = function(parent) {
