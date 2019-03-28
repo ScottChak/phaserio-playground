@@ -13,9 +13,6 @@ app.factory("PongV1Service", [
     let paddleWidth = 8;
     let paddleHeight = 64;
 
-    let maxPaddleVelocityY = 600;
-    let minPaddleVelocityY = 600;
-
     let ball;
     let paddles;
     let player1;
@@ -120,9 +117,12 @@ app.factory("PongV1Service", [
       );
 
       gameCtx.physics.add.existing(response, false);
-      response.body.setCollideWorldBounds(true);
 
       paddles.add(response);
+
+      //  SCK: Need to reset these after adding to group, can this be done on group ?
+      response.body.setCollideWorldBounds(true);
+      response.body.setImmovable(true);
 
       return response;
     }
@@ -153,20 +153,7 @@ app.factory("PongV1Service", [
     }
 
     function movePaddleTowardsPointer(gameCtx, pointer, player) {
-      let paddleVelocityYDirection = pointer.y > player.paddle.y ? 1 : -1;
-      let paddleVelocityY = 0;
-      let difference = Phaser.Math.Difference(pointer.y, player.paddle.y);
-      if (difference > 16) {
-        let paddleVelocityYFactor = Phaser.Math.SmoothStep(difference, 0, maxPaddleVelocityY);
-        paddleVelocityY = paddleVelocityYFactor * maxPaddleVelocityY;
-        if (
-          paddleVelocityY < minPaddleVelocityY &&
-          paddleVelocityY < Phaser.Math.Difference(0, player.paddle.body.velocity.y)
-        ) {
-          paddleVelocityY = minPaddleVelocityY;
-        }
-      }
-      player.paddle.body.setVelocityY(paddleVelocityYDirection * paddleVelocityY);
+      player.paddle.y = pointer.y;
     }
 
     svc.start = function(parent) {
