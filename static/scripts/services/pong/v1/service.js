@@ -58,17 +58,7 @@ app.factory("PongV1Service", [
         this.physics.world.bounds.width - scoreOffset
       );
 
-      this.input.keyboard.on("keydown-SPACE", function(event) {
-        pressSpacebar(event, this);
-      });
-
-      this.input.on(
-        "pointermove",
-        function(pointer) {
-          movePaddleTowardsPointer(this, pointer, player2);
-        },
-        this
-      );
+      createEvents(this);
     }
 
     function update() {
@@ -91,7 +81,9 @@ app.factory("PongV1Service", [
       );
 
       gameCtx.physics.add.existing(response, false);
-      response.body.setCollideWorldBounds(true);
+
+      response.body.onWorldBounds = true;
+      response.body.setCollideWorldBounds();
       response.body.setBounce(1.0, 1.0);
 
       return response;
@@ -121,8 +113,8 @@ app.factory("PongV1Service", [
       paddles.add(response);
 
       //  SCK: Need to reset these after adding to group, can this be done on group ?
-      response.body.setCollideWorldBounds(true);
-      response.body.setImmovable(true);
+      response.body.setCollideWorldBounds();
+      response.body.setImmovable();
 
       return response;
     }
@@ -131,6 +123,30 @@ app.factory("PongV1Service", [
       let response = gameCtx.add.text(positionX, 64, score, { fontFamily: "Arial", fontSize: "64px", color: "#ffffff" });
       response.setOrigin(0.5);
       return response;
+    }
+
+    function createEvents(gameCtx) {
+      gameCtx.input.keyboard.on("keydown-SPACE", function(event) {
+        pressSpacebar(event, gameCtx);
+      });
+
+      gameCtx.input.on(
+        "pointermove",
+        function(pointer) {
+          movePaddleTowardsPointer(gameCtx, pointer, player2);
+        },
+        gameCtx
+      );
+
+      gameCtx.physics.world.on("worldbounds", function(body) {
+        if (body === ball.body) {
+          if (body.right === body.world.bounds.width) {
+            score(player1);
+          } else if (body.left === 0) {
+            score(player2);
+          }
+        }
+      });
     }
 
     function startMatch(gameCtx) {
@@ -146,6 +162,12 @@ app.factory("PongV1Service", [
         ball.setPosition(gameCtx.physics.world.bounds.centerX, gameCtx.physics.world.bounds.centerY);
         matchInProgress = false;
       }
+    }
+
+    function score(player) {
+      player.score++;
+      player.scoreText.setText(player.score);
+      reset(player.paddle.body.world.scene);
     }
 
     function pressSpacebar(gameCtx, event) {
