@@ -115,6 +115,7 @@ app.factory("PongV1Service", [
       //  SCK: Need to reset these after adding to group, can this be done on group ?
       response.body.setCollideWorldBounds();
       response.body.setImmovable();
+      response.body.setMaxVelocity(0, gameCtx.physics.world.bounds.height * 2.0);
 
       return response;
     }
@@ -175,7 +176,25 @@ app.factory("PongV1Service", [
     }
 
     function movePaddleTowardsPointer(gameCtx, pointer, player) {
-      player.paddle.y = pointer.y;
+      if (Phaser.Math.Difference(pointer.y, player.paddle.y) > 1) {
+        let target = { x: player.paddle.x, y: pointer.y };
+
+        let maxVelocity = gameCtx.physics.world.bounds.height * 2.0;
+        let factorVelocity = Phaser.Math.Clamp(
+          Phaser.Math.SmoothStep(Phaser.Math.Difference(pointer.y - player.paddle.y, 0), 0, 100),
+          0.1,
+          1.0
+        );
+
+        gameCtx.physics.moveToObject(player.paddle, target, factorVelocity * maxVelocity);
+      } else {
+        player.paddle.body.setVelocity(0, 0);
+        player.paddle.y = Phaser.Math.Clamp(
+          pointer.y,
+          paddleHeight * 0.5,
+          gameCtx.physics.world.bounds.height - paddleHeight * 0.5
+        );
+      }
     }
 
     svc.start = function(parent) {
